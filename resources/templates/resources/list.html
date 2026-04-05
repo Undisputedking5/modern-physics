@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Resources - Supreme Modern Physics{% endblock %}
+
+{% block content %}
+<div class="resources-page">
+
+    <!-- Hero Banner -->
+    <div class="resources-hero">
+        <div class="hero-overlay">
+            <h1>Premium Physics Resources</h1>
+            <p>Workbooks, Past Papers & Mock Exams crafted for KCSE excellence</p>
+        </div>
+    </div>
+
+    <div class="resources-container">
+        <div class="series-banner animate-up">
+            <p><i class="fas fa-award"></i> Featured Series: <strong>Form 1 – 4 Paper 2 Revision</strong> by Mr. Barrack O. Olwero</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="resources-tabs animate-up delay-1">
+            <button class="tab-btn active" data-tab="all">All Resources</button>
+            <button class="tab-btn" data-tab="workbook">Workbooks</button>
+            <button class="tab-btn" data-tab="past_paper">Past Papers</button>
+        </div>
+
+        <!-- Resources Grid -->
+        <div class="resources-grid" id="resourcesGrid">
+            {% for resource in all_resources %}
+            <div class="resource-card glass-card animate-up delay-{{ forloop.counter|add:1 }}" data-type="{{ resource.resource_type }}">
+                <div class="card-image">
+                    {% if resource.cover_image %}
+                        <img src="{{ resource.cover_image.url }}" alt="{{ resource.title }}">
+                    {% else %}
+                        <div class="placeholder-image shimmer">
+                            <span>{{ resource.resource_type|upper }}</span>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="card-body">
+                    <span class="resource-type-badge {{ resource.resource_type }}">
+                        {{ resource.get_resource_type_display }}
+                    </span>
+
+                    <h3>{{ resource.title }}</h3>
+                    <p class="resource-series">Modern Physics Series</p>
+                    <p>{{ resource.description|truncatewords:20 }}</p>
+                </div>
+
+                <div class="card-footer">
+                    {% if resource.is_free or resource.price == 0 %}
+                        <span class="price free">FREE</span>
+                        <a href="{% url 'resources:detail' resource.id %}" class="view-btn">
+                            View Details →
+                        </a>
+                    {% else %}
+                        <span class="price">Ksh {{ resource.price }}</span>
+                        <a href="{% url 'cart:add_to_cart' resource.id %}" class="add-to-cart-btn">
+                            <i class="fas fa-cart-plus"></i> Add to Cart
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+function showTab(type) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+
+    const cards = document.querySelectorAll('.resource-card');
+    cards.forEach(card => {
+        if (type === 'all') {
+            card.style.display = 'block';
+        } else {
+            card.style.display = card.dataset.type === type ? 'block' : 'none';
+        }
+    });
+}
+</script>
+{% endblock %}

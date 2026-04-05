@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ note.title }} - Supreme Modern Physics{% endblock %}
+
+{% block content %}
+<div class="note-detail-page">
+
+    <div class="note-detail-header">
+        <a href="{% url 'notes:index' %}" class="back-btn">← Back to All Notes</a>
+
+        <div class="note-category">{{ note.category.name }}</div>
+        <h1>{{ note.title }}</h1>
+        <p class="meta-info">
+            Reading time: {{ note.read_time }}
+            • Updated: {{ note.updated_at|date:"d M Y" }}
+        </p>
+    </div>
+
+    <div class="note-content">
+
+        {% if note.image %}
+            <img src="{{ note.image.url }}" alt="{{ note.title }}" class="note-image">
+        {% endif %}
+
+        <div class="note-body">
+            {{ note.content|linebreaks }}
+        </div>
+
+        {% if note.pdf_file %}
+        <div class="pdf-download-section">
+            <a href="{{ note.pdf_file.url }}" target="_blank" class="pdf-download-btn">
+                📄 Download PDF Version (Full Notes)
+            </a>
+            <p class="pdf-note">Best for printing or offline reading</p>
+        </div>
+        {% else %}
+        <div class="no-pdf">
+            <p>No PDF available for this note yet.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ resource.title }} - Supreme Modern Physics{% endblock %}
+
+{% block content %}
+<div class="resource-detail">
+    <div class="detail-header animate-up">
+        <a href="{% url 'resources:list' %}" class="back-link">← Back to Resources</a>
+
+        <div class="detail-meta">
+            <span class="badge {{ resource.resource_type }}">{{ resource.get_resource_type_display }}</span>
+            {% if resource.is_free or resource.price == 0 %}
+                <span class="price-tag free">FREE</span>
+            {% else %}
+                <span class="price-tag">Ksh {{ resource.price }}</span>
+            {% endif %}
+        </div>
+
+        <h1>{{ resource.title }}</h1>
+        <p class="author-credits">Series: Form 1-4 Paper 2 • Author: Mr. Olwero</p>
+    </div>
+
+    <div class="detail-content">
+        <div class="detail-visual animate-scale">
+            {% if resource.cover_image %}
+                <img src="{{ resource.cover_image.url }}" alt="{{ resource.title }}">
+            {% else %}
+                <div class="placeholder-image large shimmer">
+                    <span>{{ resource.resource_type|upper }}</span>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="detail-info animate-right delay-1">
+            <div class="description glass-card" style="padding:30px; color:#333;">
+                {{ resource.description|linebreaks }}
+            </div>
+
+            {% if resource.pdf_file %}
+            <div class="download-section">
+                {% if resource.is_free or resource.price == 0 %}
+                    <a href="{{ resource.pdf_file.url }}" target="_blank" class="download-btn">
+                        <span>📥</span> Download {{ resource.get_resource_type_display }} (PDF)
+                    </a>
+                {% else %}
+                    <a href="{% url 'cart:add_to_cart' resource.id %}" class="add-to-cart-btn">
+                        <span>🛒</span> Add to Cart - Ksh {{ resource.price }}
+                    </a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

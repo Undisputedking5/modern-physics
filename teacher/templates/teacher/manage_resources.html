@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Books & Past Papers — Teacher Portal{% endblock %}
+
+{% block extra_head %}
+<style>
+.portal-page { min-height:100vh; background:linear-gradient(135deg,#0a0a0f 0%,#112D32 100%); padding:40px 5%; }
+.portal-section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; flex-wrap:wrap; gap:12px; }
+.portal-section-header h2 { color:#ffd700; font-size:1.6rem; font-weight:800; display:flex; align-items:center; gap:10px; }
+.portal-back { color:rgba(255,255,255,0.5); text-decoration:none; font-size:0.9rem; display:inline-flex; align-items:center; gap:6px; margin-bottom:20px; transition:color 0.2s; }
+.portal-back:hover { color:#ffd700; }
+.portal-add-btn { background:linear-gradient(135deg,#8b00ff,#ffd700); color:#fff; padding:11px 22px; border-radius:10px; text-decoration:none; font-weight:700; font-size:14px; display:inline-flex; align-items:center; gap:8px; transition:all 0.3s; }
+.portal-add-btn:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(139,0,255,0.4); }
+.resource-table { width:100%; border-collapse:collapse; }
+.resource-table th { background:rgba(255,215,0,0.1); color:#ffd700; font-size:0.82rem; text-transform:uppercase; letter-spacing:0.8px; padding:12px 16px; text-align:left; }
+.resource-table td { padding:14px 16px; border-bottom:1px solid rgba(255,255,255,0.06); color:rgba(255,255,255,0.8); font-size:0.93rem; vertical-align:middle; }
+.resource-table tr:hover td { background:rgba(255,255,255,0.03); }
+.type-badge { font-size:11px; padding:4px 12px; border-radius:20px; font-weight:600; }
+.type-workbook { background:rgba(255,215,0,0.15); color:#ffd700; }
+.type-past_paper { background:rgba(100,180,255,0.15); color:#64b4ff; }
+.type-mock_exam { background:rgba(50,200,120,0.15); color:#32c878; }
+.type-questions { background:rgba(200,100,255,0.15); color:#c864ff; }
+.free-badge { background:rgba(50,200,120,0.15); color:#32c878; font-size:11px; padding:3px 10px; border-radius:20px; }
+.action-btn { padding:7px 14px; border-radius:8px; text-decoration:none; font-size:0.82rem; font-weight:600; display:inline-flex; align-items:center; gap:5px; transition:all 0.2s; }
+.edit-btn { background:rgba(100,180,255,0.15); color:#64b4ff; border:1px solid rgba(100,180,255,0.2); }
+.edit-btn:hover { background:rgba(100,180,255,0.25); }
+.del-btn  { background:rgba(255,100,100,0.15); color:#ff6464; border:1px solid rgba(255,100,100,0.2); }
+.del-btn:hover { background:rgba(255,100,100,0.25); }
+.empty-table { text-align:center; padding:60px 20px; color:rgba(255,255,255,0.35); }
+.table-wrap { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:16px; overflow:hidden; }
+.messages-list { margin-bottom:20px; }
+.msg { padding:12px 18px; border-radius:10px; font-size:0.93rem; margin-bottom:8px; }
+.msg-success { background:rgba(50,200,120,0.15); color:#32c878; border:1px solid rgba(50,200,120,0.2); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="portal-page">
+    <a href="{% url 'teacher:dashboard' %}" class="portal-back"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+
+    {% if messages %}
+    <div class="messages-list">
+        {% for msg in messages %}<div class="msg msg-success">{{ msg }}</div>{% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="portal-section-header">
+        <h2><i class="fas fa-book-open"></i> Books &amp; Past Papers</h2>
+        <a href="{% url 'teacher:add_resource' %}" class="portal-add-btn"><i class="fas fa-plus"></i> Add New</a>
+    </div>
+
+    <div class="table-wrap">
+        <table class="resource-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Price</th>
+                    <th>Cover</th>
+                    <th>PDF</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in resources %}
+                <tr>
+                    <td style="color:rgba(255,255,255,0.35);">{{ forloop.counter }}</td>
+                    <td><strong>{{ r.title }}</strong></td>
+                    <td><span class="type-badge type-{{ r.resource_type }}">{{ r.get_resource_type_display }}</span></td>
+                    <td>
+                        {% if r.is_free %}<span class="free-badge">Free</span>
+                        {% else %}Ksh {{ r.price }}{% endif %}
+                    </td>
+                    <td>{% if r.cover_image %}<i class="fas fa-check" style="color:#32c878;"></i>{% else %}<i class="fas fa-times" style="color:rgba(255,255,255,0.2);"></i>{% endif %}</td>
+                    <td>{% if r.pdf_file %}<i class="fas fa-check" style="color:#32c878;"></i>{% else %}<i class="fas fa-times" style="color:rgba(255,255,255,0.2);"></i>{% endif %}</td>
+                    <td style="white-space:nowrap;">
+                        <a href="{% url 'teacher:edit_resource' r.pk %}" class="action-btn edit-btn"><i class="fas fa-pen"></i> Edit</a>
+                        <a href="{% url 'teacher:delete_resource' r.pk %}" class="action-btn del-btn"><i class="fas fa-trash"></i> Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="empty-table"><i class="fas fa-book-open" style="font-size:2rem;margin-bottom:10px;"></i><br>No books or past papers yet. Add your first one!</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

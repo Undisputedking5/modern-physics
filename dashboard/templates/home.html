@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Supreme Modern Physics Workbook{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <div class="hero-content">
+        <div class="badge">8.4.4 SHUTDOWN! • FORM 1-4 PAPER 2</div>
+
+        <h1>The New Level of <span class="highlight">Excellence</span><br>in Physics</h1>
+
+        <p class="subtitle">
+            Master Magnetic Resonance Imaging and all critical topics with clear explanations,
+            beautiful diagrams, and exam-style questions.
+        </p>
+
+        <div class="cta-buttons">
+            <a href="#" class="btn-primary">Start Learning Now</a>
+            <a href="{%url 'notes:index'  %}" class="btn-secondary">Browse All Notes</a>
+        </div>
+
+        <div class="trust-bar">
+            ★★★★★ Trusted by over 2,700+ Students
+        </div>
+    </div>
+</div>
+
+{% if announcements %}
+<div class="announcements-section">
+    <div class="section-header">
+        <h2><i class="fas fa-bullhorn"></i> Latest <span class="highlight">Updates</span></h2>
+        <p>Stay informed with the latest news from your teachers</p>
+    </div>
+    
+    <div class="announcements-grid">
+        {% for ann in announcements %}
+        <div class="announcement-card animate-up" style="animation-delay: {{ forloop.counter0|add:1 }}00ms">
+            <div class="ann-badge {{ ann.category }}">{{ ann.get_category_display }}</div>
+            <h3>{{ ann.title }}</h3>
+            <p>{{ ann.body|truncatewords:20 }}</p>
+            <div class="ann-footer">
+                <span class="date"><i class="far fa-calendar-alt"></i> {{ ann.created_at|date:"d M Y" }}</span>
+                <span class="author"><i class="far fa-user"></i> {{ ann.author.get_full_name|default:ann.author.username }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+.announcements-section {
+    padding: 60px 5%;
+    background: rgba(255, 255, 255, 0.02);
+}
+.section-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+.section-header h2 {
+    font-size: 2.2rem;
+    color: white;
+    margin-bottom: 10px;
+}
+.section-header p {
+    color: rgba(255,255,255,0.5);
+}
+.announcements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.announcement-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 30px;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+.announcement-card:hover {
+    transform: translateY(-10px);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: #ffd700;
+}
+.ann-badge {
+    align-self: flex-start;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+}
+.ann-badge.news { background: rgba(255, 215, 0, 0.2); color: #ffd700; }
+.ann-badge.info { background: rgba(100, 180, 255, 0.2); color: #64b4ff; }
+.ann-badge.event { background: rgba(50, 200, 120, 0.2); color: #32c878; }
+
+.announcement-card h3 {
+    color: #ffd700;
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+}
+.announcement-card p {
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.6;
+    margin-bottom: 20px;
+    flex-grow: 1;
+}
+.ann-footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.4);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 15px;
+}
+</style>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Confirm Deletion — Teacher Portal{% endblock %}
+{% block extra_head %}
+<style>
+.portal-page{min-height:100vh;background:linear-gradient(135deg,#0a0a0f 0%,#112D32 100%);padding:40px 5%;display:flex;align-items:center;justify-content:center;}
+.delete-card{max-width:500px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,100,100,0.2);border-radius:20px;padding:40px;text-align:center;}
+.delete-card i{font-size:3.5rem;color:#ff6464;margin-bottom:24px;}
+.delete-card h2{color:#fff;font-size:1.5rem;margin-bottom:16px;font-weight:800;}
+.delete-card p{color:rgba(255,255,255,0.6);line-height:1.6;margin-bottom:32px;}
+.btn-row{display:flex;gap:12px;justify-content:center;}
+.btn-cancel{background:rgba(255,255,255,0.08);color:white;padding:12px 28px;border-radius:10px;text-decoration:none;font-weight:600;transition:all 0.2s;}
+.btn-cancel:hover{background:rgba(255,255,255,0.15);}
+.btn-del{background:#ff6464;color:white;border:none;padding:12px 28px;border-radius:10px;font-weight:700;cursor:pointer;transition:all 0.2s;}
+.btn-del:hover{background:#ff4040;transform:scale(1.05);}
+</style>
+{% endblock %}
+{% block content %}
+<div class="portal-page">
+    <div class="delete-card">
+        <i class="fas fa-exclamation-triangle"></i>
+        <h2>Delete {{ type }}?</h2>
+        <p>Are you sure you want to delete <strong>"{{ object }}"</strong>? This action cannot be undone.</p>
+        <form method="post">
+            {% csrf_token %}
+            <div class="btn-row">
+                <a href="javascript:history.back()" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-del">Yes, Delete</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

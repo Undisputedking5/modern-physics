@@ -1,0 +1,268 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About Author — Supreme Modern Physics{% endblock %}
+
+{% block extra_head %}
+<style>
+.info-page {
+    padding: 80px 10%;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    min-height: 100vh;
+}
+
+.info-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 60px;
+    align-items: start;
+}
+
+@media (max-width: 992px) {
+    .info-container { grid-template-columns: 1fr; gap: 40px; }
+}
+
+/* Sidebar/Bio Card */
+.bio-card {
+    background: white;
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+    text-align: center;
+    position: sticky;
+    top: 120px;
+}
+
+.author-img {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 24px;
+    border: 6px solid #ffd700;
+    box-shadow: 0 10px 30px rgba(139, 0, 255, 0.2);
+}
+
+.bio-card h2 {
+    color: #4b0082;
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+    font-weight: 800;
+}
+
+.designation {
+    color: #8b00ff;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.bio-text {
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 30px;
+    font-size: 0.95rem;
+}
+
+.contact-links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #333;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.92rem;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    transition: all 0.3s;
+}
+
+.contact-item:hover {
+    background: #ffd700;
+    color: #4b0082;
+    transform: translateX(5px);
+}
+
+.contact-item i { color: #8b00ff; font-size: 1.1rem; }
+
+/* Content Section */
+.info-content section {
+    margin-bottom: 60px;
+}
+
+.info-content h2 {
+    font-size: 2.2rem;
+    color: #222;
+    margin-bottom: 24px;
+    position: relative;
+    padding-bottom: 12px;
+}
+
+.info-content h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 4px;
+    background: #ffd700;
+    border-radius: 2px;
+}
+
+.info-content p {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #444;
+    margin-bottom: 20px;
+}
+
+/* Series Grid */
+.series-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+@media (max-width: 576px) { .series-grid { grid-template-columns: 1fr; } }
+
+.series-item {
+    background: white;
+    padding: 24px;
+    border-radius: 16px;
+    border-left: 5px solid #8b00ff;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+.series-item h4 {
+    color: #4b0082;
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+}
+
+.series-item p {
+    font-size: 0.95rem;
+    margin-bottom: 0;
+    color: #666;
+}
+
+/* Quote */
+.quote-box {
+    background: #4b0082;
+    color: white;
+    padding: 40px;
+    border-radius: 24px;
+    position: relative;
+    margin-top: 40px;
+    box-shadow: 0 20px 40px rgba(75, 0, 130, 0.3);
+}
+
+.quote-box i {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 3rem;
+    opacity: 0.15;
+}
+
+.quote-box blockquote {
+    font-size: 1.3rem;
+    font-style: italic;
+    line-height: 1.6;
+    z-index: 1;
+    position: relative;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="info-page">
+    <div class="info-container">
+        
+        <!-- Bio Card -->
+        <div class="bio-card animate-up">
+            <img src="{% static 'images/supreme.jpeg' %}" alt="Author" class="author-img">
+            <h2>Mr. Barrack O. Olwero</h2>
+            <div class="designation">Modern Physics Teacher</div>
+            <p class="bio-text">
+                Dedicated educator with over 15 years of experience in simplifying complex physics concepts. 
+                Specializing in Modern Physics and the 8.4.4 Paper 2 revision series.
+            </p>
+            
+            <div class="contact-links">
+                <a href="mailto:info@supremephysics.com" class="contact-item">
+                    <i class="fas fa-envelope"></i> info@supremephysics.com
+                </a>
+                <a href="tel:+254712345678" class="contact-item">
+                    <i class="fas fa-phone"></i> +254 712 345 678
+                </a>
+                <a href="#" class="contact-item">
+                    <i class="fab fa-whatsapp"></i> Chat on WhatsApp
+                </a>
+            </div>
+        </div>
+
+        <!-- Detailed Info -->
+        <div class="info-content">
+            <section id="about" class="animate-up delay-1">
+                <h2>The Mission</h2>
+                <p>
+                    Supreme Modern Physics was founded with a single goal: to make Physics the most enjoyable and easiest 
+                    subject for students in Kenya and beyond. We believe that every concept, no matter how complex, 
+                    can be understood when presented with clarity, visual aids, and a step-by-step logical approach.
+                </p>
+                <p>
+                    Our resources are meticulously crafted to align with the 8.4.4 curriculum, focusing specifically on 
+                    the high-weightage topics found in KCSE Paper 2.
+                </p>
+            </section>
+
+            <section id="series" class="animate-up delay-2">
+                <h2>The Revision Series</h2>
+                <p>
+                    The "Form 1 – 4 Paper 2 Revision Series" is a comprehensive collection of workbooks designed 
+                    to guide students from the fundamentals to advanced exam techniques.
+                </p>
+                <div class="series-grid">
+                    <div class="series-item glass-card">
+                        <h4>Form 1 &amp; 2 Base</h4>
+                        <p>Foundational concepts: Electrostatics, Magnetism, and Current Electricity.</p>
+                    </div>
+                    <div class="series-item glass-card">
+                        <h4>Form 3 Mastery</h4>
+                        <p>Diving into Heating Effect, Light, and Geometric Optics.</p>
+                    </div>
+                    <div class="series-item glass-card">
+                        <h4>Form 4 Modern Physics</h4>
+                        <p>X-rays, Radioactivity, Photoelectric Effect, and MRI technology.</p>
+                    </div>
+                    <div class="series-item glass-card">
+                        <h4>Exam Revision</h4>
+                        <p>Past paper analysis and predicted exam-style practice questions.</p>
+                    </div>
+                </div>
+            </section>
+
+            <div class="quote-box animate-up delay-3">
+                <i class="fas fa-quote-left"></i>
+                <blockquote>
+                    "Physics is not just a subject; it's the language through which the universe communicates. 
+                    Once you learn the language, everything becomes clear."
+                </blockquote>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

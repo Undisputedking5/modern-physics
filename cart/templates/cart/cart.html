@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Shopping Cart - SMP Workbook{% endblock %}
+
+{% block content %}
+<div class="cart-container">
+    <h1>Your Shopping Cart</h1>
+
+    {% if cart_items %}
+        <div class="cart-items">
+            {% for item in cart_items %}
+                <div class="cart-item">
+                    <div class="item-info">
+                        <h3>{{ item.resource.title }}</h3>
+                        <p>{{ item.resource.description|truncatechars:100 }}</p>
+                        <div class="item-price">
+                            <span class="price">{{ item.resource.display_price }}</span>
+                            {% if not item.resource.is_free %}
+                                <span class="quantity">x {{ item.quantity }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="item-actions">
+                        {% if not item.resource.is_free %}
+                            <form method="post" action="{% url 'cart:update_quantity' item.id %}" class="quantity-form">
+                                {% csrf_token %}
+                                <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="quantity-input">
+                                <button type="submit" class="btn-update">Update</button>
+                            </form>
+                        {% endif %}
+                        <a href="{% url 'cart:remove_from_cart' item.id %}" class="btn-remove">Remove</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="cart-summary">
+            <div class="total">
+                <strong>Total: Ksh {{ total }}</strong>
+            </div>
+            <div class="checkout-actions">
+                <a href="{% url 'resources:list' %}" class="btn-secondary">Continue Shopping</a>
+                <button class="btn-primary">Proceed to Checkout</button>
+            </div>
+        </div>
+    {% else %}
+        <div class="empty-cart">
+            <i class="fas fa-shopping-cart"></i>
+            <h2>Your cart is empty</h2>
+            <p>Add some resources to get started!</p>
+            <a href="{% url 'resources:list' %}" class="btn-primary">Browse Resources</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

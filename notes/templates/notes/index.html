@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Notes - Supreme Modern Physics{% endblock %}
+
+{% block content %}
+<div class="notes-page">
+
+    <div class="notes-header">
+        <h1>Physics Notes</h1>
+        <p>Complete Form 1 – 4 Paper 2 Revision Notes</p>
+
+        <div class="search-container">
+            <input type="text" id="searchInput"
+                   placeholder="Search notes by topic or keyword..."
+                   onkeyup="filterNotes()">
+            <span class="search-icon">🔎</span>
+        </div>
+    </div>
+
+    <!-- Category Filters -->
+    <div class="category-filters" id="categoryFilters">
+        <button class="category-btn active" onclick="filterByCategory('all')">All Notes</button>
+
+        {% for category in categories %}
+        <button class="category-btn" onclick="filterByCategory('{{ category.name|lower }}')">
+            {{ category.name }}
+        </button>
+        {% endfor %}
+    </div>
+
+    <!-- Notes Grid -->
+    <div class="notes-grid" id="notesGrid">
+        {% for note in notes %}
+        <div class="note-card" data-category="{{ note.category.name|lower }}">
+            <div class="note-category">{{ note.category.name }}</div>
+            <h3>{{ note.title }}</h3>
+            <p>{{ note.description }}</p>
+
+            <div class="note-footer">
+                <span class="read-time">{{ note.read_time }}</span>
+               <a href="{% url 'notes:detail' note.id %}" class="read-btn">Read Full Note →</a>
+            </div>
+        </div>
+        {% empty %}
+        <p class="empty-state">
+            No notes found yet.<br>
+            Please add some notes from the <a href="{% url 'admin:index' %}">Admin Panel</a>.
+        </p>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+function filterNotes() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+    const cards = document.querySelectorAll('.note-card');
+
+    cards.forEach(card => {
+        const title = card.querySelector('h3').textContent.toLowerCase();
+        const desc = card.querySelector('p').textContent.toLowerCase();
+        card.style.display = (title.includes(searchTerm) || desc.includes(searchTerm)) ? 'block' : 'none';
+    });
+}
+
+function filterByCategory(category) {
+    document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+
+    if (category === 'all') {
+        document.querySelectorAll('.category-btn')[0].classList.add('active');
+    } else {
+        event.target.classList.add('active');
+    }
+
+    const cards = document.querySelectorAll('.note-card');
+    cards.forEach(card => {
+        card.style.display = (category === 'all' || card.dataset.category === category) ? 'block' : 'none';
+    });
+}
+</script>
+{% endblock %}

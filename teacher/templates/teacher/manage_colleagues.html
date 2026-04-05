@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Colleagues — Teacher Portal{% endblock %}
+
+{% block extra_head %}
+<style>
+.portal-page { min-height: 100vh; background: linear-gradient(135deg, #0a0a0f 0%, #112D32 100%); padding: 40px 5%; }
+.portal-back { color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 20px; transition: color 0.2s; }
+.portal-back:hover { color: #ffd700; }
+.portal-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+.portal-section-header h2 { color: #ffd700; font-size: 1.6rem; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+
+.search-bar { margin-bottom: 20px; display: flex; gap: 10px; }
+.search-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px 15px; color: white; width: 300px; }
+.search-btn { background: #ffd700; color: #000; border: none; border-radius: 8px; padding: 10px 20px; font-weight: 700; cursor: pointer; }
+
+.table-wrap { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; overflow: hidden; }
+.resource-table { width: 100%; border-collapse: collapse; }
+.resource-table th { background: rgba(255,215,0,0.1); color: #ffd700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.8px; padding: 12px 16px; text-align: left; }
+.resource-table td { padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); color: rgba(255,255,255,0.8); font-size: 0.93rem; vertical-align: middle; }
+.resource-table tr:hover td { background: rgba(255,255,255,0.03); }
+
+.badge-tag { font-size: 11px; padding: 4px 12px; border-radius: 20px; font-weight: 600; }
+.badge-student { background: rgba(100, 180, 255, 0.15); color: #64b4ff; }
+.badge-teacher { background: rgba(50, 200, 120, 0.15); color: #32c878; }
+.badge-admin { background: rgba(255, 215, 0, 0.15); color: #ffd700; }
+
+.role-select { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: white; padding: 5px; font-size: 0.85rem; }
+.update-btn { background: rgba(255, 215, 0, 0.2); color: #ffd700; border: 1px solid rgba(255, 215, 0, 0.3); padding: 5px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.update-btn:hover { background: rgba(255, 215, 0, 0.3); }
+
+.msg { padding: 12px 18px; border-radius: 10px; font-size: 0.93rem; margin-bottom: 20px; }
+.msg-success { background: rgba(50, 200, 120, 0.15); color: #32c878; border: 1px solid rgba(50, 200, 120, 0.2); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="portal-page">
+    <a href="{% url 'teacher:dashboard' %}" class="portal-back"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+
+    {% if messages %}
+        <div>
+            {% for msg in messages %}
+                <div class="msg msg-{{ msg.tags }}">{{ msg }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="portal-section-header">
+        <h2><i class="fas fa-users-cog"></i> Manage Colleagues</h2>
+    </div>
+
+    <form method="get" class="search-bar">
+        <input type="text" name="q" value="{{ search_query }}" placeholder="Search by username or name..." class="search-input">
+        <button type="submit" class="search-btn">Search</button>
+    </form>
+
+    <div class="table-wrap">
+        <table class="resource-table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Full Name</th>
+                    <th>Current Role</th>
+                    <th>Change Role</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for profile in profiles %}
+                <tr>
+                    <td><strong>{{ profile.user.username }}</strong></td>
+                    <td>{{ profile.full_name|default:"—" }}</td>
+                    <td>
+                        <span class="badge-tag badge-{{ profile.role }}">
+                            {{ profile.get_role_display }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if profile.role != 'admin' %}
+                        <form method="post" style="display: flex; gap: 8px; align-items: center;">
+                            {% csrf_token %}
+                            <input type="hidden" name="profile_id" value="{{ profile.pk }}">
+                            <select name="role" class="role-select">
+                                <option value="student" {% if profile.role == 'student' %}selected{% endif %}>Student</option>
+                                <option value="teacher" {% if profile.role == 'teacher' %}selected{% endif %}>Teacher</option>
+                            </select>
+                            <button type="submit" class="update-btn">Update</button>
+                        </form>
+                        {% else %}
+                        <span style="color: rgba(255,255,255,0.3); font-size: 0.85rem;">Admin role cannot be changed</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" style="text-align: center; padding: 40px; color: rgba(255,255,255,0.4);">
+                        No users found matching your search.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

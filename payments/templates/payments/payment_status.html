@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment Status - SMP Workbook{% endblock %}
+
+{% block extra_head %}
+<style>
+    .status-container {
+        max-width: 600px;
+        margin: 80px auto;
+        padding: 40px;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        backdrop-filter: blur(15px);
+    }
+    .status-icon {
+        font-size: 4rem;
+        margin-bottom: 24px;
+    }
+    .status-pending { color: #ffd700; }
+    .status-completed { color: #00ff88; }
+    .status-failed { color: #ff4d4d; }
+    
+    .loader {
+        border: 4px solid rgba(255, 255, 255, 0.1);
+        border-top: 4px solid #ffd700;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    .btn-dashboard {
+        display: inline-block;
+        margin-top: 30px;
+        padding: 12px 24px;
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        text-decoration: none;
+        border-radius: 10px;
+        transition: background 0.3s;
+    }
+    .btn-dashboard:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="status-container">
+    {% if order.status == 'pending' %}
+        <i class="fas fa-spinner fa-spin status-icon status-pending"></i>
+        <h1>Payment In Progress...</h1>
+        <p>Please check your phone for the M-Pesa prompt and enter your PIN.</p>
+        <div class="loader"></div>
+        <p style="font-size: 0.9rem; color: rgba(255,255,255,0.6);">This page will refresh automatically (or manually refresh after payment).</p>
+        <script>
+            setTimeout(function(){
+                location.reload();
+            }, 5000); // Refresh every 5 seconds
+        </script>
+    {% elif order.status == 'completed' %}
+        <i class="fas fa-check-circle status-icon status-completed"></i>
+        <h1>Payment Successful!</h1>
+        <p>Your order #{{ order.id }} has been completed successfully. You can now access your resources.</p>
+        <a href="{% url 'dashboard:home' %}" class="btn-dashboard">Go to Dashboard</a>
+    {% else %}
+        <i class="fas fa-times-circle status-icon status-failed"></i>
+        <h1>Payment Failed</h1>
+        <p>Something went wrong with your payment. Please try again.</p>
+        <a href="{% url 'payments:checkout' %}" class="btn-dashboard">Try Again</a>
+    {% endif %}
+</div>
+{% endblock %}

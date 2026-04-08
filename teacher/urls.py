@@ -30,4 +30,5 @@ urlpatterns = [
     path('lessons/edit/<int:pk>/', views.edit_lesson, name='edit_lesson'),
     path('lessons/delete/<int:pk>/', views.delete_lesson, name='delete_lesson'),
     path('colleagues/', views.manage_colleagues, name='manage_colleagues'),
+    path('payment-settings/', views.payment_settings, name='payment_settings'),
 ]

@@ -28,6 +28,7 @@ urlpatterns = [
     path('resources/', include('resources.urls', namespace='resources')),
     path('cart/', include('cart.urls', namespace='cart')),
     path('teacher/', include('teacher.urls', namespace='teacher')),
+    path('payments/', include('payments.urls', namespace='payments')),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

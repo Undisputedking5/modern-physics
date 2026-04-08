@@ -283,6 +283,11 @@
             <div class="stat-number">{{ total_lessons }}</div>
             <div class="stat-label">Lessons</div>
         </div>
+        <div class="stat-card glass-card animate-up delay-5" style="border-color: rgba(0, 255, 136, 0.3);">
+            <i class="fas fa-hand-holding-usd" style="color: #00ff88;"></i>
+            <div class="stat-number" style="color: #00ff88;">Ksh {{ total_revenue }}</div>
+            <div class="stat-label">Total Revenue</div>
+        </div>
     </div>
 
     <!-- Action Cards -->
@@ -325,6 +330,14 @@
             <p>Add or remove fellow teachers from the portal.</p>
             <div class="action-arrow"><i class="fas fa-arrow-right"></i></div>
         </a>
+
+        <a href="{% url 'teacher:payment_settings' %}" class="action-card glass-card animate-scale delay-5 luxe-card">
+            <div class="action-icon icon-gold" style="background: rgba(0, 255, 136, 0.15); color: #00ff88;"><i class="fas fa-credit-card"></i></div>
+            <h3>Payment Settings</h3>
+            <p>Update your M-Pesa Paybill, Till number and API keys.</p>
+            <div class="action-arrow"><i class="fas fa-arrow-right"></i></div>
+        </a>
+
         <style>
             .luxe-card {
                 border: 1px solid rgba(255, 215, 0, 0.3) !important;
@@ -359,6 +372,43 @@
             {% empty %}
             <p style="color:rgba(255,255,255,0.4);font-size:0.9rem;">No lessons yet.</p>
             {% endfor %}
+        </div>
+    </div>
+
+    <!-- Sales History -->
+    <div class="recent-card animate-up delay-5" style="margin-top: 24px;">
+        <h4><i class="fas fa-history"></i> Recent Sales History</h4>
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                <thead>
+                    <tr style="text-align: left; color: rgba(255,255,255,0.5); font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <th style="padding: 12px 8px;">Order ID</th>
+                        <th style="padding: 12px 8px;">Customer</th>
+                        <th style="padding: 12px 8px;">Items</th>
+                        <th style="padding: 12px 8px;">Amount</th>
+                        <th style="padding: 12px 8px;">Time</th>
+                    </tr>
+                </thead>
+                <tbody style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">
+                    {% for order in recent_transactions %}
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <td style="padding: 12px 8px;">#{{ order.id }}</td>
+                        <td style="padding: 12px 8px;">{{ order.user.username }}</td>
+                        <td style="padding: 12px 8px;">
+                            {% for item in order.items.all %}
+                                {{ item.title }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td style="padding: 12px 8px; color: #00ff88; font-weight: 600;">Ksh {{ order.total_amount }}</td>
+                        <td style="padding: 12px 8px; color: rgba(255,255,255,0.5);">{{ order.created_at|date:"M d, H:i" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" style="padding: 24px; text-align: center; color: rgba(255,255,255,0.3);">No successful transactions yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 

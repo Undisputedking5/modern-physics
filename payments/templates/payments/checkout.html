@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Checkout - SMP Workbook{% endblock %}
+
+{% block extra_head %}
+<style>
+    .checkout-container {
+        max-width: 600px;
+        margin: 60px auto;
+        padding: 40px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+    }
+    .checkout-container h1 {
+        color: #ffd700;
+        margin-bottom: 24px;
+        font-size: 2rem;
+    }
+    .order-summary {
+        margin-bottom: 30px;
+        padding: 20px;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 12px;
+    }
+    .order-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        color: rgba(255, 255, 255, 0.8);
+    }
+    .order-total {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        justify-content: space-between;
+        font-weight: 700;
+        font-size: 1.2rem;
+        color: #fff;
+    }
+    .payment-form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .form-group label {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.9rem;
+    }
+    .form-group input {
+        padding: 14px;
+        border-radius: 10px;
+        border: 2px solid rgba(0, 0, 0, 0.1);
+        background: #ffffff;
+        color: #333;
+        font-size: 1rem;
+        width: 100%;
+    }
+    .form-group input:focus {
+        border-color: #ffd700;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+    }
+
+    .btn-pay {
+        background: linear-gradient(135deg, #ffd700, #ff8c00);
+        color: #000;
+        border: none;
+        padding: 16px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .btn-pay:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
+    }
+    .mpesa-logo {
+        height: 30px;
+        margin-bottom: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="checkout-container">
+    <h1><i class="fas fa-shopping-cart"></i> Checkout</h1>
+    
+    <div class="order-summary">
+        <h4>Order Summary</h4>
+        {% for item in cart_items %}
+            <div class="order-item">
+                <span>{{ item.resource.title }} (x{{ item.quantity }})</span>
+                <span>Ksh {{ item.total_price }}</span>
+            </div>
+        {% endfor %}
+        <div class="order-total">
+            <span>Total Amount</span>
+            <span>Ksh {{ total }}</span>
+        </div>
+    </div>
+
+    <form method="POST" action="{% url 'payments:process_payment' %}" class="payment-form">
+        {% csrf_token %}
+        <img src="https://upload.wikimedia.org/wikipedia/commons/1/15/M-PESA_LOGO-01.svg" alt="M-Pesa" class="mpesa-logo">
+        <div class="form-group">
+            <label for="phone_number">M-Pesa Phone Number (e.g., 0712345678)</label>
+            <input type="text" name="phone_number" id="phone_number" placeholder="07XXXXXXXX" required>
+        </div>
+        <p style="font-size: 0.85rem; color: rgba(255,255,255,0.5);">
+            You will receive an STK push on your phone to enter your M-Pesa PIN and complete payment.
+        </p>
+        <button type="submit" class="btn-pay">Pay Ksh {{ total }}</button>
+    </form>
+</div>
+{% endblock %}

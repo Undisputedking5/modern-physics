@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'resources',
     'cart',
     'teacher',
+    'payments',
 ]
 
 MIDDLEWARE = [
@@ -84,8 +85,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
-
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
@@ -132,3 +131,11 @@ STATICFILES_DIRS = [
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# M-Pesa Settings
+MPESA_CONSUMER_KEY = 'Q7xBramuwdalAgSMjGAlOqygIhlXCtRFAAZMlwyHGQNJZRto'
+MPESA_CONSUMER_SECRET = 'IAiXGA14fwm1vnndlN8zAgo3mzN3y3qPHm4DGNSEA0KrbaWzwJk563rB3TSbRaMZ'
+MPESA_SHORTCODE = '174379'
+MPESA_PASSKEY = 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919'
+MPESA_ENVIRONMENT = 'sandbox'
+

@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment Settings — Supreme Modern Physics{% endblock %}
+
+{% block extra_head %}
+<style>
+    .settings-wrapper {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #0a0a0f 0%, #112D32 100%);
+        padding: 60px 5%;
+    }
+    .settings-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .settings-header {
+        margin-bottom: 40px;
+    }
+    .settings-header h1 {
+        color: #ffd700;
+        font-size: 2rem;
+        font-weight: 800;
+    }
+    .settings-card {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        padding: 40px;
+        backdrop-filter: blur(15px);
+    }
+    .form-group {
+        margin-bottom: 25px;
+    }
+    .form-group label {
+        display: block;
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 10px;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+    .form-group input[type="text"],
+    .form-group input[type="password"],
+    .form-group textarea {
+        width: 100%;
+        padding: 14px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        color: #fff;
+        font-size: 1rem;
+        transition: all 0.3s;
+    }
+    .form-group input:focus {
+        outline: none;
+        border-color: #ffd700;
+        background: rgba(255, 255, 255, 0.12);
+        box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+    }
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #fff;
+        font-weight: 600;
+    }
+    .checkbox-group input {
+        width: 20px;
+        height: 20px;
+        accent-color: #ffd700;
+    }
+    .btn-save {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, #ffd700, #ff8c00);
+        color: #000;
+        border: none;
+        border-radius: 12px;
+        font-weight: 800;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: transform 0.3s, box-shadow 0.3s;
+        margin-top: 20px;
+    }
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+    }
+    .alert-info {
+        background: rgba(139, 0, 255, 0.1);
+        border-left: 4px solid #8b00ff;
+        padding: 15px;
+        border-radius: 8px;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.9rem;
+        margin-bottom: 30px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="settings-wrapper">
+    <div class="settings-container">
+        <div class="settings-header">
+            <h1><i class="fas fa-cog"></i> M-Pesa Payment Settings</h1>
+            <p style="color: rgba(255,255,255,0.5);">Configure your Lipa Na M-Pesa Online credentials here.</p>
+        </div>
+
+        <div class="settings-card">
+            <div class="alert-info">
+                <i class="fas fa-info-circle"></i> These settings control how students pay for resources. Ensure keys are copied exactly from the Safaricom Daraja Portal.
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="short_code">Business Short Code (Paybill/Till)</label>
+                    <input type="text" name="short_code" id="short_code" value="{{ config.short_code|default:'174379' }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="consumer_key">Consumer Key</label>
+                    <input type="text" name="consumer_key" id="consumer_key" value="{{ config.consumer_key }}" placeholder="Your Daraja App Consumer Key" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="consumer_secret">Consumer Secret</label>
+                    <input type="password" name="consumer_secret" id="consumer_secret" value="{{ config.consumer_secret }}" placeholder="Your Daraja App Consumer Secret" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="passkey">LNM Online Passkey</label>
+                    <textarea name="passkey" id="passkey" rows="2" placeholder="Lipa Na M-Pesa Online Passkey" required>{{ config.passkey }}</textarea>
+                </div>
+
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" name="is_sandbox" id="is_sandbox" {% if config.is_sandbox %}checked{% endif %}>
+                    <label for="is_sandbox" style="margin-bottom: 0;">Enable Sandbox Mode (Test Environment)</label>
+                </div>
+
+                <button type="submit" class="btn-save">Save Configuration</button>
+            </form>
+        </div>
+
+        <a href="{% url 'teacher:dashboard' %}" style="display: block; text-align: center; margin-top: 30px; color: #ffd700; text-decoration: none; font-weight: 700;">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -8,4 +8,11 @@ def home(request):
 
 
 def info(request):
-    return render(request, 'dashboard/info.html')
+    from teacher.models import Announcement, Lesson
+    announcements = Announcement.objects.filter(is_published=True).order_by('-created_at')
+    latest_lessons = Lesson.objects.filter(is_published=True).order_by('-created_at')[:5]
+    
+    return render(request, 'dashboard/info.html', {
+        'announcements': announcements,
+        'latest_lessons': latest_lessons
+    })

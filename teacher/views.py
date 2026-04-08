@@ -6,6 +6,8 @@ from django.db import models
 from notes.models import Note, Category
 from resources.models import Resource
 from .models import Announcement, Lesson
+from payments.models import Order, OrderItem, MpesaConfiguration
+from django.db.models import Sum
 
 
 def is_teacher_or_admin(user):
@@ -28,14 +30,19 @@ def teacher_required(view_func):
 @login_required(login_url='accounts:login')
 @user_passes_test(is_teacher_or_admin, login_url='accounts:login')
 def dashboard(request):
+    total_revenue = Order.objects.filter(status='completed').aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+    recent_transactions = Order.objects.filter(status='completed').order_by('-created_at')[:10]
+
     context = {
         'total_books': Resource.objects.filter(resource_type='workbook').count(),
         'total_past_papers': Resource.objects.filter(resource_type='past_paper').count(),
         'total_notes': Note.objects.count(),
         'total_announcements': Announcement.objects.count(),
         'total_lessons': Lesson.objects.count(),
+        'total_revenue': total_revenue,
         'recent_announcements': Announcement.objects.all()[:5],
         'recent_lessons': Lesson.objects.all()[:5],
+        'recent_transactions': recent_transactions,
     }
     return render(request, 'teacher/dashboard.html', context)
 
@@ -330,3 +337,36 @@ def manage_colleagues(request):
         'profiles': profiles,
         'search_query': search_query
     })
+
+
+@login_required(login_url='accounts:login')
+@user_passes_test(is_admin, login_url='accounts:login')
+def payment_settings(request):
+    config = MpesaConfiguration.objects.first()
+    
+    if request.method == 'POST':
+        short_code = request.POST.get('short_code', '').strip()
+        consumer_key = request.POST.get('consumer_key', '').strip()
+        consumer_secret = request.POST.get('consumer_secret', '').strip()
+        passkey = request.POST.get('passkey', '').strip()
+        is_sandbox = request.POST.get('is_sandbox') == 'on'
+        
+        if config:
+            config.short_code = short_code
+            config.consumer_key = consumer_key
+            config.consumer_secret = consumer_secret
+            config.passkey = passkey
+            config.is_sandbox = is_sandbox
+            config.save()
+        else:
+            MpesaConfiguration.objects.create(
+                short_code=short_code,
+                consumer_key=consumer_key,
+                consumer_secret=consumer_secret,
+                passkey=passkey,
+                is_sandbox=is_sandbox
+            )
+        messages.success(request, "M-Pesa configuration updated successfully.")
+        return redirect('teacher:payment_settings')
+
+    return render(request, 'teacher/payment_settings.html', {'config': config})

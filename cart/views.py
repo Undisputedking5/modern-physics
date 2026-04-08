@@ -45,5 +45,6 @@ def update_quantity(request, item_id):
             cart_item.save()
         else:
             cart_item.delete()
-        return JsonResponse({'success': True})
-    return JsonResponse({'success': False})
+        return redirect('cart:view_cart')
+    return redirect('cart:view_cart')
+

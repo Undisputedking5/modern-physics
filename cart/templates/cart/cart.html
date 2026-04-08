@@ -41,7 +41,7 @@
             </div>
             <div class="checkout-actions">
                 <a href="{% url 'resources:list' %}" class="btn-secondary">Continue Shopping</a>
-                <button class="btn-primary">Proceed to Checkout</button>
+                <a href="{% url 'payments:checkout' %}" class="btn-primary">Proceed to Checkout</a>
             </div>
         </div>
     {% else %}

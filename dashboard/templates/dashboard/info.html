@@ -183,6 +183,57 @@
     z-index: 1;
     position: relative;
 }
+/* News Section */
+.news-section {
+    margin-top: 40px;
+}
+.news-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.news-item {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    border-left: 5px solid #ffd700;
+}
+.news-item .meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.category-badge {
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+.badge-news { background: #e3f2fd; color: #1976d2; }
+.badge-info { background: #f3e5f5; color: #7b1fa2; }
+.badge-event { background: #fff3e0; color: #f57c00; }
+
+.news-item h3 { color: #4b0082; margin-bottom: 15px; font-size: 1.4rem; }
+.news-item p { color: #555; font-size: 1rem; margin-bottom: 0; }
+.news-date { color: #888; font-size: 0.85rem; }
+
+/* Lesson List */
+.lesson-list {
+    margin-top: 20px;
+    list-style: none;
+}
+.lesson-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+.lesson-item i { color: #8b00ff; }
+.lesson-item:last-child { border-bottom: none; }
 </style>
 {% endblock %}
 
@@ -253,6 +304,43 @@
                     </div>
                 </div>
             </section>
+
+            {% if announcements %}
+            <section id="news" class="news-section animate-up delay-2">
+                <h2>Latest News & Announcements</h2>
+                <div class="news-grid">
+                    {% for announcement in announcements %}
+                    <div class="news-item">
+                        <div class="meta">
+                            <span class="category-badge badge-{{ announcement.category }}">
+                                {{ announcement.get_category_display }}
+                            </span>
+                            <span class="news-date">{{ announcement.created_at|date:"M d, Y" }}</span>
+                        </div>
+                        <h3>{{ announcement.title }}</h3>
+                        <p>{{ announcement.body|linebreaksbr }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+
+            {% if latest_lessons %}
+            <section id="lessons" class="animate-up delay-2">
+                <h2>Latest Lessons Added</h2>
+                <div class="lesson-list">
+                    {% for lesson in latest_lessons %}
+                    <div class="lesson-item">
+                        <i class="fas fa-play-circle"></i>
+                        <div>
+                            <strong>{{ lesson.get_form_display }}: {{ lesson.title }}</strong>
+                            <p style="font-size: 0.85rem; margin: 0; color: #777;">{{ lesson.topic }} - {{ lesson.created_at|timesince }} ago</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
 
             <div class="quote-box animate-up delay-3">
                 <i class="fas fa-quote-left"></i>

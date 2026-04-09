@@ -16,6 +16,10 @@ from dotenv import load_dotenv
 load_dotenv()   # This loads your .env file
 
 import dj_database_url
+import cloudinary
+cloudinary.config(
+    secure=True
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -51,6 +55,8 @@ INSTALLED_APPS = [
     'cart',
     'teacher',
     'payments',
+    'cloudinary',
+    'cloudinary_storage',
 ]
 
 MIDDLEWARE = [
@@ -153,3 +159,4 @@ MPESA_SHORTCODE = '174379'
 MPESA_PASSKEY = 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919'
 MPESA_ENVIRONMENT = 'sandbox'
 
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'

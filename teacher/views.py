@@ -128,6 +128,58 @@ def manage_notes(request):
 
 @login_required(login_url='accounts:login')
 @user_passes_test(is_teacher_or_admin, login_url='accounts:login')
+def manage_categories(request):
+    categories = Category.objects.all()
+    return render(request, 'teacher/manage_categories.html', {'categories': categories})
+
+
+@login_required(login_url='accounts:login')
+@user_passes_test(is_teacher_or_admin, login_url='accounts:login')
+def add_category(request):
+    from django.utils.text import slugify
+    if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+        if name:
+            slug = slugify(name)
+            # Ensure unique slug
+            base_slug = slug
+            counter = 1
+            while Category.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            
+            Category.objects.create(name=name, slug=slug)
+            messages.success(request, f'Category "{name}" added.')
+            return redirect('teacher:manage_categories')
+    return render(request, 'teacher/category_form.html', {'action': 'Add', 'category': None})
+
+
+@login_required(login_url='accounts:login')
+@user_passes_test(is_teacher_or_admin, login_url='accounts:login')
+def edit_category(request, pk):
+    category = get_object_or_404(Category, pk=pk)
+    if request.method == 'POST':
+        category.name = request.POST.get('name', category.name).strip()
+        category.save()
+        messages.success(request, f'Category updated.')
+        return redirect('teacher:manage_categories')
+    return render(request, 'teacher/category_form.html', {'action': 'Edit', 'category': category})
+
+
+@login_required(login_url='accounts:login')
+@user_passes_test(is_teacher_or_admin, login_url='accounts:login')
+def delete_category(request, pk):
+    category = get_object_or_404(Category, pk=pk)
+    if request.method == 'POST':
+        name = category.name
+        category.delete()
+        messages.success(request, f'Category "{name}" deleted.')
+        return redirect('teacher:manage_categories')
+    return render(request, 'teacher/confirm_delete.html', {'object': category, 'type': 'Category'})
+
+
+@login_required(login_url='accounts:login')
+@user_passes_test(is_teacher_or_admin, login_url='accounts:login')
 def add_note(request):
     categories = Category.objects.all()
     if request.method == 'POST':

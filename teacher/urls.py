@@ -17,6 +17,12 @@ urlpatterns = [
     path('notes/add/', views.add_note, name='add_note'),
     path('notes/edit/<int:pk>/', views.edit_note, name='edit_note'),
     path('notes/delete/<int:pk>/', views.delete_note, name='delete_note'),
+    
+    # Categories
+    path('categories/', views.manage_categories, name='manage_categories'),
+    path('categories/add/', views.add_category, name='add_category'),
+    path('categories/edit/<int:pk>/', views.edit_category, name='edit_category'),
+    path('categories/delete/<int:pk>/', views.delete_category, name='delete_category'),
 
     # Announcements / News
     path('announcements/', views.manage_announcements, name='manage_announcements'),

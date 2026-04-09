@@ -43,10 +43,16 @@
             </div>
         </div>
         {% empty %}
-        <p class="empty-state">
-            No notes found yet.<br>
-            Please add some notes from the <a href="{% url 'admin:index' %}">Admin Panel</a>.
-        </p>
+        <div class="empty-state animate-up delay-2" style="grid-column: 1 / -1; text-align: center; padding: 80px 20px; color: rgba(255,255,255,0.4);">
+            <i class="fa-regular fa-clipboard" style="font-size: 3.5rem; margin-bottom: 20px; color: rgba(139, 0, 255, 0.2);"></i>
+            <h3 style="color: #4b0082; margin-bottom: 10px;">No Notes Found</h3>
+            <p>Our teachers are currently preparing comprehensive physics notes. Please check back soon!</p>
+            {% if user.is_authenticated and user.is_superuser %}
+            <a href="{% url 'teacher:manage_notes' %}" class="category-btn active" style="margin-top: 24px; display: inline-block; text-decoration: none;">
+                <i class="fas fa-plus"></i> Add First Note
+            </a>
+            {% endif %}
+        </div>
         {% endfor %}
     </div>
 </div>

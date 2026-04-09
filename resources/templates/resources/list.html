@@ -64,6 +64,17 @@
                     {% endif %}
                 </div>
             </div>
+            {% empty %}
+            <div class="empty-state animate-up delay-2" style="grid-column: 1 / -1; text-align: center; padding: 80px 20px; color: rgba(255,255,255,0.4);">
+                <i class="fas fa-book-open" style="font-size: 3rem; margin-bottom: 20px; color: rgba(255,215,0,0.2);"></i>
+                <h3 style="color: white; margin-bottom: 10px;">No Resources Found</h3>
+                <p>We are currently updating our library. Please check back soon!</p>
+                {% if user.is_authenticated and user.is_superuser %}
+                <a href="{% url 'teacher:manage_resources' %}" class="tab-btn active" style="margin-top: 24px; display: inline-block;">
+                    <i class="fas fa-plus"></i> Add First Resource
+                </a>
+                {% endif %}
+            </div>
             {% endfor %}
         </div>
     </div>

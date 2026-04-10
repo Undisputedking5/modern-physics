@@ -17,10 +17,35 @@ load_dotenv()   # This loads your .env file
 
 import dj_database_url
 import cloudinary
-cloudinary.config(
-    secure=True
-)
+import cloudinary.uploader
+import cloudinary.api
 
+# ==================== CLOUDINARY CONFIGURATION ====================
+# Preferred method: Use CLOUDINARY_URL (easiest for Vercel/Heroku/etc.)
+# Get this from Cloudinary Dashboard → Settings → API Keys → "API environment variable"
+CLOUDINARY_URL = os.environ.get('CLOUDINARY_URL')
+
+if CLOUDINARY_URL:
+    cloudinary.config(
+        CLOUDINARY_URL=CLOUDINARY_URL,
+        secure=True
+    )
+else:
+    # Fallback: Use individual environment variables (safer than hardcoding)
+    cloudinary.config(
+        cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME'),
+        api_key=os.environ.get('CLOUDINARY_API_KEY'),
+        api_secret=os.environ.get('CLOUDINARY_API_SECRET'),
+        secure=True
+    )
+
+# Cloudinary storage settings for django-cloudinary-storage
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+    'SECURE': True,
+}
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -45,7 +70,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'cloudinary_storage',
+    'cloudinary_storage',      # Must come before staticfiles
     'django.contrib.staticfiles',
     'cloudinary',
     'accounts',
@@ -98,6 +123,8 @@ DATABASES = {
         conn_health_checks=True,
     )
 }
+
+
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
@@ -134,19 +161,19 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-# This tells Django where to look for static files during development
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
-    BASE_DIR / 'static',          # ← Must be a flat list like this
+    BASE_DIR / 'static',
 ]
 
-# Optional: For production (collectstatic)
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+
 # Storage configuration
-if os.environ.get('CLOUDINARY_URL'):
+if os.environ.get('CLOUDINARY_URL') or os.environ.get('CLOUDINARY_CLOUD_NAME'):
     STORAGES = {
         "default": {
             "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
@@ -166,12 +193,9 @@ else:
     }
 
 
-
 # M-Pesa Settings
 MPESA_CONSUMER_KEY = 'Q7xBramuwdalAgSMjGAlOqygIhlXCtRFAAZMlwyHGQNJZRto'
 MPESA_CONSUMER_SECRET = 'IAiXGA14fwm1vnndlN8zAgo3mzN3y3qPHm4DGNSEA0KrbaWzwJk563rB3TSbRaMZ'
 MPESA_SHORTCODE = '174379'
 MPESA_PASSKEY = 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919'
 MPESA_ENVIRONMENT = 'sandbox'
-
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'

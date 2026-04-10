@@ -43,12 +43,24 @@ class Lesson(models.Model):
 
     @property
     def get_embed_url(self):
-        if self.video_url:
-            if 'youtube.com/watch?v=' in self.video_url:
-                return self.video_url.replace('watch?v=', 'embed/')
-            elif 'youtu.be/' in self.video_url:
-                return self.video_url.replace('youtu.be/', 'youtube.com/embed/')
-        return self.video_url
+        if not self.video_url:
+            return ""
+        
+        video_id = ""
+        url = self.video_url
+        
+        if "youtube.com/watch?v=" in url:
+            video_id = url.split("watch?v=")[1].split("&")[0]
+        elif "youtu.be/" in url:
+            video_id = url.split("youtu.be/")[1].split("?")[0]
+        elif "youtube.com/embed/" in url:
+            video_id = url.split("embed/")[1].split("?")[0]
+        elif "youtube.com/shorts/" in url:
+            video_id = url.split("shorts/")[1].split("?")[0]
+            
+        if video_id:
+            return f"https://www.youtube.com/embed/{video_id}"
+        return url
 
     class Meta:
         ordering = ['-created_at']

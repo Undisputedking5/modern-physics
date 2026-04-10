@@ -24,4 +24,6 @@ app_name='dashboard'
 urlpatterns = [
     path('home/', views.home, name='home'),
     path('info/', views.info, name='info'),
+    path('lessons/', views.lesson_list, name='lesson_list'),
+    path('lessons/<int:pk>/', views.lesson_detail, name='lesson_detail'),
 ]

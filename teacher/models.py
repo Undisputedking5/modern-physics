@@ -41,8 +41,14 @@ class Lesson(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return f"Form {self.form} – {self.title}"
+    @property
+    def get_embed_url(self):
+        if self.video_url:
+            if 'youtube.com/watch?v=' in self.video_url:
+                return self.video_url.replace('watch?v=', 'embed/')
+            elif 'youtu.be/' in self.video_url:
+                return self.video_url.replace('youtu.be/', 'youtube.com/embed/')
+        return self.video_url
 
     class Meta:
         ordering = ['-created_at']

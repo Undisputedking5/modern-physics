@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Video Lessons — Supreme Modern Physics{% endblock %}
+
+{% block extra_head %}
+<style>
+.lessons-page {
+    padding: 80px 5%;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0a0a0f 0%, #112D32 100%);
+}
+
+.lessons-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.lessons-header h1 {
+    font-size: 3rem;
+    color: #ffd700;
+    margin-bottom: 16px;
+    font-weight: 800;
+}
+
+.lessons-header p {
+    color: rgba(255,255,255,0.6);
+    font-size: 1.2rem;
+}
+
+.form-section {
+    margin-bottom: 80px;
+}
+
+.form-title {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+    color: white;
+}
+
+.form-title h2 {
+    font-size: 2rem;
+    margin: 0;
+}
+
+.form-line {
+    flex-grow: 1;
+    height: 1px;
+    background: linear-gradient(90deg, #ffd700, transparent);
+}
+
+.lessons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 30px;
+}
+
+.lesson-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 30px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: relative;
+    overflow: hidden;
+}
+
+.lesson-card:hover {
+    transform: translateY(-10px);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: #ffd700;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+.lesson-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: #ffd700;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.lesson-card:hover::before {
+    opacity: 1;
+}
+
+.lesson-icon {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 215, 0, 0.1);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: #ffd700;
+}
+
+.lesson-card h3 {
+    font-size: 1.4rem;
+    color: white;
+    font-weight: 700;
+    margin: 0;
+}
+
+.lesson-topic {
+    font-size: 0.9rem;
+    color: #ffd700;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.lesson-desc {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.lesson-footer {
+    padding-top: 15px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: rgba(255,255,255,0.4);
+    font-size: 0.85rem;
+}
+
+.btn-watch {
+    margin-top: 10px;
+    background: #ffd700;
+    color: #000;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-weight: 700;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.lesson-card:hover .btn-watch {
+    background: #fff;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="lessons-page">
+    <div class="lessons-header animate-up">
+        <h1>Video <span class="highlight">Lessons</span></h1>
+        <p>Step-by-step physics mastery from Form 1 to Form 4</p>
+    </div>
+
+    {% for form, lessons in grouped_lessons %}
+    <section class="form-section">
+        <div class="form-title animate-up">
+            <h2>Form {{ form }}</h2>
+            <div class="form-line"></div>
+        </div>
+        
+        <div class="lessons-grid">
+            {% for lesson in lessons %}
+            <a href="{% url 'dashboard:lesson_detail' lesson.pk %}" class="lesson-card animate-up" style="animation-delay: {{ forloop.counter }}00ms">
+                <div class="lesson-icon">
+                    <i class="fas {% if lesson.video_url %}fa-play-circle{% else %}fa-file-pdf{% endif %}"></i>
+                </div>
+                <div>
+                    <div class="lesson-topic">{{ lesson.topic }}</div>
+                    <h3>{{ lesson.title }}</h3>
+                </div>
+                <p class="lesson-desc">{{ lesson.description }}</p>
+                <div class="btn-watch">Start Lesson</div>
+                <div class="lesson-footer">
+                    <span><i class="far fa-calendar-alt"></i> {{ lesson.created_at|date:"M d, Y" }}</span>
+                    <span><i class="far fa-user"></i> Mr. Olwero</span>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+    {% empty %}
+    <div style="text-align: center; color: rgba(255,255,255,0.4); padding: 100px 0;">
+        <i class="fas fa-chalkboard-teacher" style="font-size: 4rem; margin-bottom: 20px;"></i>
+        <h2>No lessons have been published yet.</h2>
+        <p>Check back later for new content!</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

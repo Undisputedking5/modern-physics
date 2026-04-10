@@ -325,22 +325,20 @@
             </section>
             {% endif %}
 
-            {% if latest_lessons %}
             <section id="lessons" class="animate-up delay-2">
                 <h2>Latest Lessons Added</h2>
                 <div class="lesson-list">
                     {% for lesson in latest_lessons %}
-                    <div class="lesson-item">
+                    <a href="{% url 'dashboard:lesson_detail' lesson.pk %}" class="lesson-item" style="text-decoration: none; color: inherit; transition: background 0.3s; border-radius: 12px;">
                         <i class="fas fa-play-circle"></i>
                         <div>
                             <strong>{{ lesson.get_form_display }}: {{ lesson.title }}</strong>
                             <p style="font-size: 0.85rem; margin: 0; color: #777;">{{ lesson.topic }} - {{ lesson.created_at|timesince }} ago</p>
                         </div>
-                    </div>
+                    </a>
                     {% endfor %}
                 </div>
             </section>
-            {% endif %}
 
             <div class="quote-box animate-up delay-3">
                 <i class="fas fa-quote-left"></i>

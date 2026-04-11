@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.db import models
+
 
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -16,7 +18,12 @@ class Note(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="notes")
     description = models.TextField(blank=True)
     content = models.TextField(blank=True)           # Full note content
-    pdf_file = models.FileField(upload_to='notes/pdfs/', blank=True, null=True)
+    pdf_file = models.FileField(
+        upload_to='notes/pdfs/',
+        blank=True,
+        null=True,
+        storage=settings.PDF_STORAGE,
+    )
     image = models.ImageField(upload_to='notes/images/', blank=True, null=True)
     read_time = models.CharField(max_length=20, default="10 min")
     created_at = models.DateTimeField(auto_now_add=True)

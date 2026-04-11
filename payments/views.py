@@ -1,7 +1,8 @@
+from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import JsonResponse, HttpResponse
+from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
 from .models import Order, OrderItem, MpesaTransaction
@@ -72,18 +73,36 @@ def process_payment(request):
                 quantity=item.quantity
             )
 
-        # Initiate STK Push
-        callback_url = request.build_absolute_uri(reverse('payments:mpesa_callback'))
-        
-        # FIX: Safaricom rejects localhost/127.0.0.1 in CallBackURL.
-        # Use a dummy public domain for local development to ensure the prompt shows up.
-        if '127.0.0.1' in callback_url or 'localhost' in callback_url:
-            logger.warning(f"Localhost detected in callback URL: {callback_url}. Using placeholder for Safaricom compatibility.")
-            callback_url = "https://mydomain.com/mpesa/callback/" # Placeholder public URL
-        
+        # Initiate STK Push — M-Pesa requires a public HTTPS callback (not localhost).
+        public_base = getattr(settings, "PUBLIC_SITE_URL", "") or ""
+        if public_base:
+            callback_url = public_base.rstrip("/") + reverse("payments:mpesa_callback")
+        else:
+            callback_url = request.build_absolute_uri(reverse("payments:mpesa_callback"))
+
+        if "127.0.0.1" in callback_url or "localhost" in callback_url:
+            messages.error(
+                request,
+                "M-Pesa cannot reach localhost. Deploy the app and set PUBLIC_SITE_URL to your "
+                "HTTPS site (e.g. https://your-app.vercel.app), or use a tunnel URL while testing.",
+            )
+            order.delete()
+            return redirect("payments:checkout")
+
         response = initiate_stk_push(phone_number, total, callback_url, order.id)
 
-        if response and response.get('ResponseCode') == '0':
+        if response is None:
+            order.status = "failed"
+            order.save()
+            messages.error(
+                request,
+                "Payment service is unavailable. Check M-Pesa credentials in the environment or admin, "
+                "and server logs for details.",
+            )
+            return redirect("payments:checkout")
+
+        rc = response.get("ResponseCode")
+        if rc == "0" or rc == 0:
             MpesaTransaction.objects.create(
                 order=order,
                 merchant_request_id=response.get('MerchantRequestID'),
@@ -95,53 +114,66 @@ def process_payment(request):
             # Clear cart? No, wait for successful payment.
             return redirect('payments:payment_status', order_id=order.id)
         else:
-            order.status = 'failed'
+            order.status = "failed"
             order.save()
-            messages.error(request, "Failed to initiate payment. Please try again.")
-            return redirect('payments:checkout')
+            err_msg = "Failed to initiate payment. Please try again."
+            if response:
+                err_msg = response.get("CustomerMessage") or response.get("errorMessage") or err_msg
+            messages.error(request, err_msg)
+            return redirect("payments:checkout")
 
     return redirect('cart:view_cart')
 
 @csrf_exempt
 def mpesa_callback(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        logger.info(f"M-Pesa Callback Data: {data}")
-        
-        stk_callback = data.get('Body', {}).get('stkCallback', {})
-        checkout_request_id = stk_callback.get('CheckoutRequestID')
-        result_code = stk_callback.get('ResultCode')
-        result_desc = stk_callback.get('ResultDesc')
+    if request.method != "POST":
+        return HttpResponse("OK")
 
-        try:
-            transaction = MpesaTransaction.objects.get(checkout_request_id=checkout_request_id)
-            transaction.result_code = result_code
-            transaction.result_desc = result_desc
-            
-            if result_code == 0:
-                transaction.status = 'Success'
-                # Extract receipt number
-                callback_metadata = stk_callback.get('CallbackMetadata', {}).get('Item', [])
-                for item in callback_metadata:
-                    if item.get('Name') == 'MpesaReceiptNumber':
-                        transaction.mpesa_receipt_number = item.get('Value')
-                        break
-                
-                # Update Order status
-                order = transaction.order
-                order.status = 'completed'
-                order.save()
-                
-                # Clear User's Cart
-                CartItem.objects.filter(user=order.user).delete()
-            else:
-                transaction.status = 'Failed'
-                transaction.order.status = 'failed'
-                transaction.order.save()
-            
-            transaction.save()
-        except MpesaTransaction.DoesNotExist:
-            logger.error(f"Transaction not found for CheckoutRequestID: {checkout_request_id}")
+    try:
+        data = json.loads(request.body.decode("utf-8") if request.body else "{}")
+    except (json.JSONDecodeError, UnicodeDecodeError) as e:
+        logger.exception("M-Pesa callback invalid JSON: %s", e)
+        return HttpResponse("Bad Request", status=400)
+
+    logger.info("M-Pesa Callback Data: %s", data)
+
+    stk_callback = data.get("Body", {}).get("stkCallback", {})
+    checkout_request_id = stk_callback.get("CheckoutRequestID")
+    result_code = stk_callback.get("ResultCode")
+    result_desc = stk_callback.get("ResultDesc")
+
+    if not checkout_request_id:
+        logger.error("M-Pesa callback missing CheckoutRequestID")
+        return HttpResponse("OK")
+
+    try:
+        transaction = MpesaTransaction.objects.get(checkout_request_id=checkout_request_id)
+    except MpesaTransaction.DoesNotExist:
+        logger.error("Transaction not found for CheckoutRequestID: %s", checkout_request_id)
+        return HttpResponse("OK")
+
+    transaction.result_code = result_code
+    transaction.result_desc = result_desc
+
+    if result_code in (0, "0"):
+        transaction.status = "Success"
+        callback_metadata = stk_callback.get("CallbackMetadata", {}).get("Item", [])
+        for item in callback_metadata:
+            if item.get("Name") == "MpesaReceiptNumber":
+                transaction.mpesa_receipt_number = item.get("Value")
+                break
+
+        order = transaction.order
+        order.status = "completed"
+        order.save()
+
+        CartItem.objects.filter(user=order.user).delete()
+    else:
+        transaction.status = "Failed"
+        transaction.order.status = "failed"
+        transaction.order.save()
+
+    transaction.save()
 
     return HttpResponse("OK")
 

@@ -1,5 +1,6 @@
-from django.db import models
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.db import models
 
 
 class Announcement(models.Model):
@@ -35,7 +36,12 @@ class Lesson(models.Model):
     topic = models.CharField(max_length=200, blank=True)
     description = models.TextField(blank=True)
     video_url = models.URLField(blank=True, null=True, help_text="YouTube or any video link")
-    pdf_file = models.FileField(upload_to='lessons/pdfs/', blank=True, null=True)
+    pdf_file = models.FileField(
+        upload_to='lessons/pdfs/',
+        blank=True,
+        null=True,
+        storage=settings.PDF_STORAGE,
+    )
     is_published = models.BooleanField(default=True)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

@@ -23,21 +23,25 @@ def get_mpesa_config():
 
 def get_mpesa_access_token():
     config = get_mpesa_config()
-    consumer_key = config.consumer_key
-    consumer_secret = config.consumer_secret
-    
+    consumer_key = (config.consumer_key or "").strip()
+    consumer_secret = (config.consumer_secret or "").strip()
+
+    if not consumer_key or not consumer_secret:
+        logger.error("M-Pesa OAuth skipped: missing consumer_key or consumer_secret (settings or admin config).")
+        return None
+
     api_url = "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials"
     if not config.is_sandbox:
         api_url = "https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials"
-    
+
     try:
         res = requests.get(api_url, auth=(consumer_key, consumer_secret), timeout=10)
         if res.status_code != 200:
-            print(f"M-Pesa Token Error: {res.status_code} - {res.text}")
+            logger.error("M-Pesa Token Error: %s - %s", res.status_code, res.text)
         res.raise_for_status()
         return res.json().get('access_token')
     except Exception as e:
-        print(f"Error getting M-Pesa token: {e}")
+        logger.exception("Error getting M-Pesa token: %s", e)
         return None
 
 
@@ -47,8 +51,12 @@ def initiate_stk_push(phone_number, amount, callback_url, order_id):
         return None
 
     config = get_mpesa_config()
-    business_short_code = config.short_code
-    passkey = config.passkey
+    business_short_code = (config.short_code or "").strip()
+    passkey = (config.passkey or "").strip()
+
+    if not business_short_code or not passkey:
+        logger.error("M-Pesa STK skipped: missing short_code or passkey (settings or admin config).")
+        return None
     timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
     password = base64.b64encode(f"{business_short_code}{passkey}{timestamp}".encode()).decode()
 

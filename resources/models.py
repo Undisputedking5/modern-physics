@@ -1,5 +1,6 @@
-from django.db import models
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.db import models
 
 class Resource(models.Model):
     RESOURCE_TYPES = [
@@ -15,7 +16,12 @@ class Resource(models.Model):
     price = models.DecimalField(max_digits=6, decimal_places=2, default=0.00)   # 0 = Free
     is_free = models.BooleanField(default=False)
 
-    pdf_file = models.FileField(upload_to='resources/pdfs/', blank=True, null=True)
+    pdf_file = models.FileField(
+        upload_to='resources/pdfs/',
+        blank=True,
+        null=True,
+        storage=settings.PDF_STORAGE,
+    )
     cover_image = models.ImageField(upload_to='resources/covers/', blank=True, null=True)
 
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
